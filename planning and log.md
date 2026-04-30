@@ -28,7 +28,7 @@ Florian Velten (6344097)
 
 ---
 ## Goals
-1. Quantify (algebraically) how the Fourier coefficients for a specific encoding strategy based on the $e^{ixH}$-type feature maps and a specific measurement operator depend on the optimisation parameters
+1. Quantify (algebraically, if possible) how the Fourier coefficients depend on the optimisation parameters, for a specific encoding strategy based on the $e^{ixH}$-type feature maps and a specific measurement operator
 2. Formulate and test hypotheses regarding the relative performance (expressivity and generalisation) of the same encoding strategy with different hyperparameter settings and different encoding Hamiltonians
 3. Formulate and test hypotheses regarding the relative performance (expressivity and generalisation) of another feature map with the same overall encoding strategy
 
@@ -80,4 +80,14 @@ Such bounds would allow *structural risk minimisation*, which minimises not only
 A minimum in this combination represents the optimal model complexity for the task at hand.
 The authors go on to analyse different encoding strategies and their associated generalisation bound scaling.
 
-Formulated goals.
+Formulated goals 1-3.
+
+
+
+### Week 18
+#### Th 30 Apr
+Reading [Fourier Fingerprints of Ansatzes in Quantum Machine Learning](https://arxiv.org/pdf/2508.20868).
+They take a more close look at the dependence of the Fourier coefficients on the Ansatzes.
+It seems that Circuit 19 from the referenced paper ([Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms](https://arxiv.org/pdf/1905.10876)) has a good performance for favourable simplicity and parameter scaling, so I will use it.
+
+As for the observable, the simple *total magnetisation* $M = \sum_{i=1}^{n} Z_i$ seems like a decent choice.
