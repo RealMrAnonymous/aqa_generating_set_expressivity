@@ -91,3 +91,55 @@ They take a more close look at the dependence of the Fourier coefficients on the
 It seems that Circuit 19 from the referenced paper ([Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms](https://arxiv.org/pdf/1905.10876)) has a good performance for favourable simplicity and parameter scaling, so I will use it.
 
 As for the observable, the simple *total magnetisation* $M = \sum_{i=1}^{n} Z_i$ seems like a decent choice.
+
+Wrote initial code for the variational Ansatz and the observable.
+
+
+#### Fr 1 May
+Fixed some errors in the code from yesterday.
+
+After some thinking (and chatting with copilot), I came to the conclusion that "different classes of generators of rotations" refer to types of Hamiltonians.
+For example, different classes might be "single-qubit", or "k-local", or something richer.
+I'll want to pick my classes (once I can compare two, I can compare any number) and select two specific elements per class.
+One element should already be diagonal, the other should not.
+Here they are:
+
+| Class                                     | $\Omega$ (at $L=1$)                 | Element 1                            | Element 2                               |
+|-------------------------------------------|-------------------------------------|--------------------------------------|-----------------------------------------|
+| Single-qubit Pauli                        | $\{-1,0,+1\}$                       | $\frac{1}{2}Z_1$                     | $\frac{1}{2}Y_1$                        |
+| Sum of 3 Paulis                           | $\{-3,\dots,+3\}$                   | $\frac{1}{2}(Z_1+Z_2+Z_3)$           | $\frac{1}{2}(X_1+Y_2+Z_3)$              |
+| Engineerd spectrum                        | large subset of $\{-34,\dots,+34\}$ | $\mathrm{diag}(0,1,4,9,15,22,32,34)$ | omit if no difference from basis change |
+| Random linear combination of three Paulis | random                              |                                      |                                         |
+
+See [Golomb ruler](https://en.wikipedia.org/wiki/Golomb_ruler) for the engineered spectrum one.
+The missing frequencies are 16, 20, 24, 26, 27, and 29.
+
+I will want to restrict myself to a single data dimension, since that is not a constraint I'm required to vary.
+One real input means simple visualisation and low complexity.
+
+I can also vary the layer, which would enrich the spectrum, but I'll start with $L=1$.
+
+One could also vary whether the spectrum consists of integers or not.
+However, irrational values of the spectrum seem unphysical in some sense, or at least algebraically independent values seem unphysical.
+Thus, since we can always rescale so that rational eigenvalues all become integers, I will limit myself to integers in the first place.
+
+Next steps:
+1. Analyse Fourier coefficient range per circuit
+2. Generate random coefficients per class instance and thus function for the circuits to approximate
+3. Generate fully random instance of function class (e.g. polynomial, truncated Fourier series)
+
+
+Worked on analysing Fourier coefficients.
+Turns out that `np.fft.fft(values, norm='forward')` does exactly what you want if you feed it the output values of the target function for inputs `np.linspace(0, 2*np.pi, n_points)`.
+The value at index $k$ gives you the value of coefficient $c_k$.
+All possible coefficients can be obtained as array using `np.fft.fftfreq(n_points, 1/n_points)`.
+
+Wrote code to visualise the Fourier coefficient spread of the different generators.
+Now that I write this, I realise though that this is not too interesting, since the spread is determined mostly by the ansatz, which I keep fixed.
+I have however confirmed that the generators behave as expected: the single-qubit Z rotation only generates sinusoids, the sum of three Z rotations generates frequencies up to $\pm 3$, and the engineerd spectrum generator generates frequencies up to $\pm 34$.
+
+Here's a way to interpret "using the encoding as regularisation technique": In theory, you'd want to maximise expressibility given the amount of qubits, so maximise the size of $\Omega$.
+However, this could induce overfitting, so limiting the size of $\Omega$ could be interpreted as a regularisation technique.
+A way to analyse this could be to design generators with different sizes of $\Omega$ and to then check whether undershooting, overshooting, or synchronising with the maximum frequency in the 
+
+Ended with having done steps 1 and 2 above, which is technically enough to start fitting some data... next week.
