@@ -49,16 +49,19 @@ def single_pauli_z_circuit(x: float, theta: np.ndarray) -> qml.measurements.Expe
     return qml.expval(observable())
 
 
-def single_pauli_x(x: float):
-    """
-    Single controlled X rotation on qubit 0. Can be generalised to any N_QUBITS.
-    """
-    qml.RX(x, wires=0)
+# def single_pauli_x_circuit(x: float, theta: np.ndarray) -> qml.measurements.ExpectationMP:
+#     """
+#     Single controlled X rotation on qubit 0. Can be generalised to any N_QUBITS.
+#     """
+#     variational_layer(theta[:3*N_QUBITS])
+#     qml.RX(x, wires=0)
+#     variational_layer(theta[3*N_QUBITS:])
+#     return qml.expval(observable())
 
 
 def triple_pauli_z_circuit(x: float, theta: np.ndarray) -> qml.measurements.ExpectationMP:
     """
-    PQC with triple-qubit Z rotation as encoding gate
+    PQC with triple-qubit Z rotation as encoding gate.
     """
     variational_layer(theta[:3*N_QUBITS])
     qml.RZ(x, wires=0)
@@ -68,21 +71,22 @@ def triple_pauli_z_circuit(x: float, theta: np.ndarray) -> qml.measurements.Expe
     return qml.expval(observable())
 
 
-def triple_pauli_mixed(x: float):
-    """
-    Controlled mixed rotations on the first 3 qubits. Cannot be generalised.
-    """
-    qml.RX(x, wires=0)
-    qml.RY(x, wires=1)
-    qml.RZ(x, wires=2)
+# def triple_pauli_mixed_circuit(x: float, theta: np.ndarray) -> qml.measurements.ExpectationMP:
+#     """
+#     Controlled mixed rotations on the first 3 qubits. Cannot be generalised.
+#     """
+#     variational_layer(theta[:3*N_QUBITS])
+#     qml.RX(x, wires=0)
+#     qml.RY(x, wires=1)
+#     qml.RZ(x, wires=2)
+#     variational_layer(theta[3*N_QUBITS:])
+#     return qml.expval(observable())
 
 
 def optimal_spectrum_diagonal_circuit(x: float, theta: np.ndarray) -> qml.measurements.ExpectationMP:
     """
     Applies a rotation on the first 3 qubits based on a diagonal Hermitian matrix, whose spectrum is engineered so that the set of differences of eigenvalues is a maximal set.
     See Golomb ruler on Wikipedia.
-
-    :param x: the rotation angle
     """
     variational_layer(theta[:3*N_QUBITS])
     matrix = np.diag([0,1,4,9,15,22,32,34])
@@ -93,17 +97,38 @@ def optimal_spectrum_diagonal_circuit(x: float, theta: np.ndarray) -> qml.measur
     return qml.expval(observable())
 
 
+def optimal_pauli_combination_circuit(x: float, theta: np.ndarray) -> qml.measurements.ExpectationMP:
+    """
+    Applies a rotation on the first 3 qubits with generator 1/2*(Z_1 + 3Z_2 + 9Z_3).
+    """
+    variational_layer(theta[:3*N_QUBITS])
+    qml.RZ(x, wires=0)
+    qml.RZ(3*x, wires=1)
+    qml.RZ(9*x, wires=2)
+    variational_layer(theta[3*N_QUBITS:])
+    return qml.expval(observable())
+
+
 def generate_random_instance(
         circuit_function: Callable,
         device: qml.Device,
         n_params: int=6*N_QUBITS,
         seed: int=42
 ) -> Callable:
+    """
+    Generate a random instance of one of the parametrised quantum circuits.
+
+    :param circuit_function: the PQC type
+    :param device: the device to generate the QNode on
+    :param n_params: the number of parameters in the PQC
+    :param seed: seed to initialise the parameters with
+    :return: function that takes a single float as input and outputs the expectation value of a random instance of the given PQC type
+    """
     rng = np.random.default_rng(seed)
     params = rng.random(n_params)
     circuit = qml.QNode(circuit_function, device)
 
-    def circuit_function(x: float) -> float:
+    def circuit_wrapper(x: float) -> float:
         return circuit(x, params)
 
-    return circuit_function
+    return circuit_wrapper

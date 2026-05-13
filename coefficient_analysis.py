@@ -39,7 +39,7 @@ def show_random_plots(function: Callable, n_params: int, n_points: int=100, n_pl
 
 def main():
     device = qml.device("default.qubit", wires=N_QUBITS)
-    circuit = qml.QNode(optimal_spectrum_diagonal_circuit, device)
+    circuit = qml.QNode(optimal_pauli_combination_circuit, device)
 
     # show_random_plots(circuit, n_params=6*N_QUBITS, n_points=1000)
 
@@ -47,12 +47,12 @@ def main():
     fig, ((ax0, ax1, ax2), (ax3, ax4, ax5)) = plt.subplots(2, 3, sharex=True, sharey=True)
     axs = [ax0, ax1, ax2, ax3, ax4, ax5]
     for idx in range(6):
-        if idx == 0: axs[idx].scatter(fourier_spread[:,16].real, fourier_spread[:,16].imag)
-        if idx == 1: axs[idx].scatter(fourier_spread[:,20].real, fourier_spread[:,20].imag)
-        if idx == 2: axs[idx].scatter(fourier_spread[:,24].real, fourier_spread[:,24].imag)
-        if idx == 3: axs[idx].scatter(fourier_spread[:,26].real, fourier_spread[:,26].imag)
-        if idx == 4: axs[idx].scatter(fourier_spread[:,27].real, fourier_spread[:,27].imag)
-        if idx == 5: axs[idx].scatter(fourier_spread[:,29].real, fourier_spread[:,29].imag)
+        if idx == 0: axs[idx].scatter(fourier_spread[:,1].real, fourier_spread[:,2].imag)
+        if idx == 1: axs[idx].scatter(fourier_spread[:,2].real, fourier_spread[:,2].imag)
+        if idx == 2: axs[idx].scatter(fourier_spread[:,5].real, fourier_spread[:,5].imag)
+        if idx == 3: axs[idx].scatter(fourier_spread[:,10].real, fourier_spread[:,10].imag)
+        if idx == 4: axs[idx].scatter(fourier_spread[:,13].real, fourier_spread[:,13].imag)
+        if idx == 5: axs[idx].scatter(fourier_spread[:,14].real, fourier_spread[:,14].imag)
         axs[idx].set_xlim(-1, 1)
         axs[idx].set_ylim(-1, 1)
 

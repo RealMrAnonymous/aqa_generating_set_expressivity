@@ -100,19 +100,21 @@ Fixed some errors in the code from yesterday.
 
 After some thinking (and chatting with copilot), I came to the conclusion that "different classes of generators of rotations" refer to types of Hamiltonians.
 For example, different classes might be "single-qubit", or "k-local", or something richer.
-I'll want to pick my classes (once I can compare two, I can compare any number) and select two specific elements per class.
-One element should already be diagonal, the other should not.
-Here they are:
+I'll want to pick my classes (once I can compare two, I can compare any number) and select a specific element per class.
+I can restrict myself to diagonal elements because any basis change can be absorbed into the variational part.
+Also, I'm interested in architectures, not specifics.
+Anyway, here they are:
 
-| Class                                     | $\Omega$ (at $L=1$)                 | Element 1                            | Element 2                               |
-|-------------------------------------------|-------------------------------------|--------------------------------------|-----------------------------------------|
-| Single-qubit Pauli                        | $\{-1,0,+1\}$                       | $\frac{1}{2}Z_1$                     | $\frac{1}{2}Y_1$                        |
-| Sum of 3 Paulis                           | $\{-3,\dots,+3\}$                   | $\frac{1}{2}(Z_1+Z_2+Z_3)$           | $\frac{1}{2}(X_1+Y_2+Z_3)$              |
-| Engineerd spectrum                        | large subset of $\{-34,\dots,+34\}$ | $\mathrm{diag}(0,1,4,9,15,22,32,34)$ | omit if no difference from basis change |
-| Random linear combination of three Paulis | random                              |                                      |                                         |
+| Class                                        | $\Omega$ (at $L=1$)                 | Element                              |
+|----------------------------------------------|-------------------------------------|--------------------------------------|
+| Single-qubit Pauli                           | $\{-1,0,+1\}$                       | $\frac{1}{2}Z_1$                     |
+| Sum of 3 Paulis                              | $\{-3,\dots,+3\}$                   | $\frac{1}{2}(Z_1+Z_2+Z_3)$           |
+| Engineerd spectrum                           | large subset of $\{-34,\dots,+34\}$ | $\mathrm{diag}(0,1,4,9,15,22,32,34)$ |
+| Engineerd linear combination of three Paulis | $\{-13,\dots,+13\}$                 | $\frac{1}{2}(Z_1+3Z_2+9Z_3)$         |
 
 See [Golomb ruler](https://en.wikipedia.org/wiki/Golomb_ruler) for the engineered spectrum one.
 The missing frequencies are 16, 20, 24, 26, 27, and 29.
+As for the engineered linear combination one, I wrote a quick program to check every integer linear combination for the optimal arrangement of scalars to maximise the size of $\Omega$, and this is it.
 
 I will want to restrict myself to a single data dimension, since that is not a constraint I'm required to vary.
 One real input means simple visualisation and low complexity.
@@ -143,3 +145,43 @@ However, this could induce overfitting, so limiting the size of $\Omega$ could b
 A way to analyse this could be to design generators with different sizes of $\Omega$ and to then check whether undershooting, overshooting, or synchronising with the maximum frequency in the 
 
 Ended with having done steps 1 and 2 above, which is technically enough to start fitting some data... next week.
+
+
+
+### Week 19
+#### Tu 5 May
+I started with a very simple Adam optimiser circuit, where the single-qubit Pauli Z circuit tries to learn a random instance of the single-qubit Pauli X circuit.
+This works really well, but I made several important observations.
+- 1000 iterations is plenty for these simple models.
+- The step size (i.e. learning rate) matters a lot, but values should not be too large (0.01 is fine). Otherwise, the loss function graph oscillates wildly, which suggests overcompensation.
+- The collocation points matter a lot. Five equally spaced points on $[0, 2\pi]$, including the start and end points, works great, but take fewer or skew them, and the model fails (at least initially).
+
+I feel like the question now becomes: **What is interesting enough to investigate?**
+After all, I have the setup now to do everything they ask (except for regularisation).
+I think a good answer is twofold:
+1. What kind of function classes can be approximated using these encoding strategies?
+2. And if we allow pre-processing (other than scaling and shifting)?
+
+
+
+### Week 20
+#### Tu 12 May
+Asking questions during tutorial.
+Conclusion is that reproducing the results from the paper will yield a sufficient grade, and as long as I do something original on top of that, it will likely be 8+.
+The TA also mentioned something about "peaked circuits", but I'm not sure how relevant that can be here.
+
+
+#### We 13 May
+I should first plan and complete the analysis for the setup I already have.
+For this, I need to:
+1. Generate random functions (three instances of each type) to fit: truncated Fourier series of max frequency 1, 3, 10 and 35; polynomials of degrees 1, 3, and 10. Also pick a crazy oscillating function such as $\exp(-\kappa\lambda x)\cos(\lambda x)$ for $\kappa = 0.1$ and $\lambda\in\{8,20\}$ as in the paper.
+2. Fit the four models to each; find a max steps and a learning rate that works for all (or two sets that each work for half or something).
+3. Produce plots and tables per instance:
+   - Plot: ground truth, each of the models' best fits, mark collocation points (pick number using Nyquist for Fourier series, $n+1$ for polynomials)
+   - Plot: loss function (log scale on $y$-axis) of each model
+   - Table: training errors, test errors
+4. Discuss the results, and compare with generalisation bounds.
+
+After that, I can think about doing pre-processing by scaling into $[-1,1]$ and applying $\arccos$ before fitting.
+
+Jesus Christ this will be a lot of work :(
