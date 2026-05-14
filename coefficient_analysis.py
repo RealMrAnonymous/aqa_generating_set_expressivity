@@ -1,4 +1,4 @@
-from definitions import *
+from quantum import *
 import matplotlib.pyplot as plt
 from typing import Callable
 
@@ -47,12 +47,12 @@ def main():
     fig, ((ax0, ax1, ax2), (ax3, ax4, ax5)) = plt.subplots(2, 3, sharex=True, sharey=True)
     axs = [ax0, ax1, ax2, ax3, ax4, ax5]
     for idx in range(6):
-        if idx == 0: axs[idx].scatter(fourier_spread[:,1].real, fourier_spread[:,2].imag)
-        if idx == 1: axs[idx].scatter(fourier_spread[:,2].real, fourier_spread[:,2].imag)
-        if idx == 2: axs[idx].scatter(fourier_spread[:,5].real, fourier_spread[:,5].imag)
-        if idx == 3: axs[idx].scatter(fourier_spread[:,10].real, fourier_spread[:,10].imag)
-        if idx == 4: axs[idx].scatter(fourier_spread[:,13].real, fourier_spread[:,13].imag)
-        if idx == 5: axs[idx].scatter(fourier_spread[:,14].real, fourier_spread[:,14].imag)
+        if idx == 0: axs[idx].scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag)
+        if idx == 1: axs[idx].scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag)
+        if idx == 2: axs[idx].scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag)
+        if idx == 3: axs[idx].scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag)
+        if idx == 4: axs[idx].scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag)
+        if idx == 5: axs[idx].scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag)
         axs[idx].set_xlim(-1, 1)
         axs[idx].set_ylim(-1, 1)
 

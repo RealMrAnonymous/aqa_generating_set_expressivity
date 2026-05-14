@@ -175,7 +175,7 @@ The TA also mentioned something about "peaked circuits", but I'm not sure how re
 I should first plan and complete the analysis for the setup I already have.
 For this, I need to:
 1. Generate random functions (three instances of each type) to fit: truncated Fourier series of max frequency 1, 3, 10 and 35; polynomials of degrees 1, 3, and 10. Also pick a crazy oscillating function such as $\exp(-\kappa\lambda x)\cos(\lambda x)$ for $\kappa = 0.1$ and $\lambda\in\{8,20\}$ as in the paper.
-2. Fit the four models to each; find a max steps and a learning rate that works for all (or two sets that each work for half or something).
+2. Fit the four models to each and to each other; find a max steps and a learning rate that works for all (or two sets that each work for half or something).
 3. Produce plots and tables per instance:
    - Plot: ground truth, each of the models' best fits, mark collocation points (pick number using Nyquist for Fourier series, $n+1$ for polynomials)
    - Plot: loss function (log scale on $y$-axis) of each model
@@ -185,3 +185,13 @@ For this, I need to:
 After that, I can think about doing pre-processing by scaling into $[-1,1]$ and applying $\arccos$ before fitting.
 
 Jesus Christ this will be a lot of work :(
+
+I will start by sampling the Fourier coefficients of the random truncated series within the unit disc, but the empirical spread suggests that this will not quite work.
+That's a problem for later
+
+Apparently, generating random polynomials that look reasonable within the given window is quite difficult.
+I also think that the higher degrees are unnecessary, since I surmise that the models won't fit very well anyway, so I'll decrease the degrees.
+I'll do degrees 1, 2 and 3.
+
+#### Th 14 May
+Finished point 1 of the plan above.
