@@ -1,5 +1,4 @@
 .venv
 .idea
-Latex/*
-!Latex/report.tex
-!Latex/report.pdf
+tables
+plots

@@ -112,8 +112,8 @@ def optimal_pauli_combination_circuit(x: float, theta: np.ndarray) -> qml.measur
 def generate_random_instance(
         circuit_function: Callable,
         device: qml.Device,
+        rng: np.random.Generator,
         n_params: int=6*N_QUBITS,
-        seed: int=42
 ) -> Callable:
     """
     Generate a random instance of one of the parametrised quantum circuits.
@@ -121,10 +121,9 @@ def generate_random_instance(
     :param circuit_function: the PQC type
     :param device: the device to generate the QNode on
     :param n_params: the number of parameters in the PQC
-    :param seed: seed to initialise the parameters with
+    :param rng: random number generator
     :return: function that takes a single float as input and outputs the expectation value of a random instance of the given PQC type
     """
-    rng = np.random.default_rng(seed)
     params = rng.random(n_params)
     circuit = qml.QNode(circuit_function, device)
 

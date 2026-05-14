@@ -195,3 +195,7 @@ I'll do degrees 1, 2 and 3.
 
 #### Th 14 May
 Finished point 1 of the plan above.
+
+Also finished points 2 and 3.
+Turns out that the optimal spectrum kinda flopped.
+I'm going to have to do some reruns with different hyperparameters (larger learning rate, more steps).
