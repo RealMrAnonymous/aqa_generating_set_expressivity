@@ -199,3 +199,11 @@ Finished point 1 of the plan above.
 Also finished points 2 and 3.
 Turns out that the optimal spectrum kinda flopped.
 I'm going to have to do some reruns with different hyperparameters (larger learning rate, more steps).
+
+
+#### Fri 15 May
+On second thought, the optimal spectrum is not too bad.
+What's more interesting is to try some reruns for all models on the non-periodic classes of polynomials and another one that I will now determine.
+In these reruns, I'll want to tinker with the hyperparameters, such as more qubits and more training steps.
+
+Interesting instances of non-periodic functions are: sqrt, exp, and sigmoid.

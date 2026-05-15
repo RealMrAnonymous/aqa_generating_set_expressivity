@@ -37,27 +37,42 @@ def show_random_plots(function: Callable, n_params: int, n_points: int=100, n_pl
     plt.show()
 
 
-def main():
-    device = qml.device("default.qubit", wires=N_QUBITS)
-    circuit = qml.QNode(optimal_pauli_combination_circuit, device)
+def main(model_name: str, show: bool=True):
+    model_dict = {
+        "Single Pauli Z": single_pauli_z_circuit,
+        "Triple Pauli Z": triple_pauli_z_circuit,
+        "Pauli Combination": optimal_pauli_combination_circuit,
+        "Optimal Spectrum": optimal_spectrum_diagonal_circuit,
+    }
 
-    # show_random_plots(circuit, n_params=6*N_QUBITS, n_points=1000)
+    device = qml.device("default.qubit", wires=N_QUBITS)
+    circuit = qml.QNode(model_dict[model_name], device)
 
     fourier_spread = get_fourier_spread(circuit, n_params=6*N_QUBITS)
-    fig, ((ax0, ax1, ax2), (ax3, ax4, ax5)) = plt.subplots(2, 3, sharex=True, sharey=True)
-    axs = [ax0, ax1, ax2, ax3, ax4, ax5]
-    for idx in range(6):
-        if idx == 0: axs[idx].scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag)
-        if idx == 1: axs[idx].scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag)
-        if idx == 2: axs[idx].scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag)
-        if idx == 3: axs[idx].scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag)
-        if idx == 4: axs[idx].scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag)
-        if idx == 5: axs[idx].scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag)
-        axs[idx].set_xlim(-1, 1)
-        axs[idx].set_ylim(-1, 1)
+    fig, axes = plt.subplots(3, 3, sharex=True, sharey=True, figsize=(6,6.5), layout='constrained')
+    axes = [ax for row in axes for ax in row]
 
-    plt.show()
+    # change which coefficients are plotted in each subplot
+    coefficient_map = [0, 1, 2, 16, 24, 33, 34, 35, 36]
+    for idx, ax in enumerate(axes):
+        idx = coefficient_map[idx]
+        ax.scatter(fourier_spread[:,idx].real, fourier_spread[:,idx].imag, s=8)
+        ax.set_title(f"Frequency ${f"\\pm{idx}" if idx > 0 else "0"}$")
+        ax.set_xlim(-1, 1)
+        ax.set_ylim(-1, 1)
+
+    fig.supxlabel("Real part")
+    fig.supylabel("Imaginary part")
+    fig.suptitle(f"Fourier coefficient spread of model {model_name}")
+
+    if show:
+        plt.show()
+    else:
+        plt.savefig(f"plots/Coefficients {model_name}.png", dpi=300)
 
 
 if __name__ == '__main__':
-    main()
+    model_name = "Optimal Spectrum"
+    show = False
+
+    main(model_name, show)
