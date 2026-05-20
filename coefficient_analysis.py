@@ -37,18 +37,21 @@ def show_random_plots(function: Callable, n_params: int, n_points: int=100, n_pl
     plt.show()
 
 
-def main(model_name: str, show: bool=True):
+def scatter_coefficients(model_name: str, show: bool=True):
     model_dict = {
         "Single Pauli Z": single_pauli_z_circuit,
         "Triple Pauli Z": triple_pauli_z_circuit,
         "Pauli Combination": optimal_pauli_combination_circuit,
         "Optimal Spectrum": optimal_spectrum_diagonal_circuit,
+        "Optimal Spectrum Extra Layers": optimal_spectrum_more_parameters_circuit,
     }
 
     device = qml.device("default.qubit", wires=N_QUBITS)
     circuit = qml.QNode(model_dict[model_name], device)
 
-    fourier_spread = get_fourier_spread(circuit, n_params=6*N_QUBITS)
+    n_params = 12*N_QUBITS if model_name == "Optimal Spectrum Extra Layers" else 6*N_QUBITS
+    fourier_spread = get_fourier_spread(circuit, n_params=n_params)
+
     fig, axes = plt.subplots(3, 3, sharex=True, sharey=True, figsize=(6,6.5), layout='constrained')
     axes = [ax for row in axes for ax in row]
 
@@ -71,8 +74,77 @@ def main(model_name: str, show: bool=True):
         plt.savefig(f"plots/Coefficients {model_name}.png", dpi=300)
 
 
-if __name__ == '__main__':
-    model_name = "Optimal Spectrum"
-    show = False
+def plot_variances():
+    model_dict = {
+        "Single Pauli Z": {
+            "function": single_pauli_z_circuit,
+            "n_params": 6*N_QUBITS,
+            "max_freq": 5,
+        },
+        "Triple Pauli Z": {
+            "function": triple_pauli_z_circuit,
+            "n_params": 6*N_QUBITS,
+            "max_freq": 5,
+        },
+        "Pauli Combination": {
+            "function": optimal_pauli_combination_circuit,
+            "n_params": 6*N_QUBITS,
+            "max_freq": 20,
+        },
+        "Optimal Spectrum": {
+            "function": optimal_spectrum_diagonal_circuit,
+            "n_params": 6*N_QUBITS,
+            "max_freq": 40,
+        },
+        "Optimal Spectrum Extra Layers": {
+            "function": optimal_spectrum_more_parameters_circuit,
+            "n_params": 12*N_QUBITS,
+            "max_freq": 40,
+        },
+    }
 
-    main(model_name, show)
+    device = qml.device("default.qubit", wires=N_QUBITS)
+
+    fig, axes = plt.subplots(2, 2, sharey=True, figsize=(6,6), layout='constrained')
+    axes = [ax for row in axes for ax in row]
+
+    for idx, (model_name, model_details) in enumerate(model_dict.items()):
+        circuit = qml.QNode(model_details["function"], device)
+        n_params = model_details["n_params"]
+        max_freq = model_details["max_freq"]
+        freqs = np.arange(max_freq+1)
+
+        fourier_spread = get_fourier_spread(circuit, n_params=n_params)
+        deviations = np.std(fourier_spread[:,:max_freq+1], axis=0)
+
+        ax = axes[idx] if idx < len(model_dict)-1 else axes[idx-1]
+        if idx <=1:
+            ax.set_xticks(freqs)
+        if idx <= 2:
+            ax.bar(freqs, deviations, width=0.8)
+            ax.set_title(f"Model: {model_name}")
+            ax.grid(axis='y')
+            step = 5 if idx == 2 else 1
+            ax.set_xticks(np.arange(0, max_freq+1, step))
+        elif idx == 3:
+            ax.bar(freqs-0.2, deviations, label="Normal", width=0.4)
+            ax.set_title(f"Model: {model_name}")
+            ax.grid(axis='y')
+            ax.set_xticks(np.arange(0, max_freq+1, 5))
+        elif idx == 4:
+            ax.bar(freqs+0.2, deviations, label="Extra layers", width=0.4)
+            ax.legend()
+
+    fig.supxlabel("Frequency")
+    fig.supylabel("Standard deviation")
+    fig.suptitle("Coefficient spread per model")
+    fig.savefig("plots/Coefficient variances.png", dpi=300)
+
+
+if __name__ == '__main__':
+    # show = True
+    # show = False
+    # model_name = "Optimal Spectrum Extra Layers"
+    # scatter_coefficients(model_name, show)
+
+    plot_variances()

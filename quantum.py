@@ -97,6 +97,21 @@ def optimal_spectrum_diagonal_circuit(x: float, theta: np.ndarray) -> qml.measur
     return qml.expval(observable())
 
 
+def optimal_spectrum_more_parameters_circuit(x: float, theta: np.ndarray) -> qml.measurements.ExpectationMP:
+    """
+    Same as *optimal_spectrum_diagonal_circuit*, but applies two variational layers before and after the data encoding
+    """
+    variational_layer(theta[:3*N_QUBITS])
+    variational_layer(theta[3*N_QUBITS:6*N_QUBITS])
+    matrix = np.diag([0,1,4,9,15,22,32,34])
+    # disable inspection below because "coeff" is annotated as float even though it can canonically be complex
+    # noinspection PyTypeChecker
+    qml.exp(qml.Hermitian(matrix, [0,1,2]), coeff=1j*x)
+    variational_layer(theta[6*N_QUBITS:9*N_QUBITS])
+    variational_layer(theta[9*N_QUBITS:])
+    return qml.expval(observable())
+
+
 def optimal_pauli_combination_circuit(x: float, theta: np.ndarray) -> qml.measurements.ExpectationMP:
     """
     Applies a rotation on the first 3 qubits with generator 1/2*(Z_1 + 3Z_2 + 9Z_3).

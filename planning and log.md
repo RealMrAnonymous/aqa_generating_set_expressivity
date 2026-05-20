@@ -207,3 +207,25 @@ What's more interesting is to try some reruns for all models on the non-periodic
 In these reruns, I'll want to tinker with the hyperparameters, such as more qubits and more training steps.
 
 Interesting instances of non-periodic functions are: sqrt, exp, and sigmoid.
+I have implemented these and fitted against them.
+
+
+
+### Week 21
+#### Mo 18 May
+Type-type-type-type-type the report.
+I also decided to change the RMSE test error to MSE, to enable comparisons with the training MSE.
+Stupid to not have done that in the first place.
+
+Finished typing up results and discussion, so only conclusion to go, but I want to do preprocessing as well, so that's next.
+
+
+#### Tu 19 May
+The attempts at preprocessing failed miserably, so I'm going to instead investigate whether I can get the Engineered spectrum generator to work by adding two trainable layers, i.e. changing the architecture.
+
+Also, I need to start writing a readme to explain the code.
+
+
+#### We 20 May
+The attempts at adding two trainable layers also failed, so I'm going to cut my losses and just finish the report.
+I'm only going to add one more graph, which should display the Fourier spread of this idea.
