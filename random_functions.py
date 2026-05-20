@@ -56,7 +56,7 @@ def generate_random_polynomial(degree: int, rng: np.random.Generator) -> Callabl
     Doesn't work very well for degrees higher than 3 since the values at the edges of the interval explode.
 
     :param degree: number of roots, i.e. the degree of the polynomial
-    :param rng: random numbe rgenerator
+    :param rng: random number generator
     :return: callable real->real function
     """
     assert degree > 0, "degree must be a non-negative integer"

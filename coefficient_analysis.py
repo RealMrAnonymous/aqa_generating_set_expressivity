@@ -38,6 +38,9 @@ def show_random_plots(function: Callable, n_params: int, n_points: int=100, n_pl
 
 
 def scatter_coefficients(model_name: str, show: bool=True):
+    """
+    Calculates the Fourier coefficient spread over 100 random instances of the given model and plots nine scatter plots.
+    """
     model_dict = {
         "Single Pauli Z": single_pauli_z_circuit,
         "Triple Pauli Z": triple_pauli_z_circuit,
@@ -75,6 +78,10 @@ def scatter_coefficients(model_name: str, show: bool=True):
 
 
 def plot_variances():
+    """
+    Plots the standard deviations of the Fourier coefficient spread per frequency of all five models.
+    :return:
+    """
     model_dict = {
         "Single Pauli Z": {
             "function": single_pauli_z_circuit,
@@ -117,16 +124,18 @@ def plot_variances():
         fourier_spread = get_fourier_spread(circuit, n_params=n_params)
         deviations = np.std(fourier_spread[:,:max_freq+1], axis=0)
 
+        # plot the last two spreads in the same graph
         ax = axes[idx] if idx < len(model_dict)-1 else axes[idx-1]
-        if idx <=1:
-            ax.set_xticks(freqs)
         if idx <= 2:
+            # the first three graphs need no labels or other special treatment
             ax.bar(freqs, deviations, width=0.8)
             ax.set_title(f"Model: {model_name}")
             ax.grid(axis='y')
+            # set the stepsize of the Optimal sum of Paulis model to 5 on the x-axis, the Single- and Triple-qubit models have stepsize 1
             step = 5 if idx == 2 else 1
             ax.set_xticks(np.arange(0, max_freq+1, step))
         elif idx == 3:
+            # there are two plots here, so we need a small offset
             ax.bar(freqs-0.2, deviations, label="Normal", width=0.4)
             ax.set_title(f"Model: {model_name}")
             ax.grid(axis='y')
